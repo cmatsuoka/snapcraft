@@ -48,7 +48,6 @@ def apply_extensions(yaml_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     # Don't modify the dict passed in
     yaml_data = copy.deepcopy(yaml_data)
-    original_yaml_data = copy.deepcopy(yaml_data)
     base = yaml_data.get("base")
 
     # Mapping of extension names to set of app names to which the extension needs to be
@@ -67,14 +66,38 @@ def apply_extensions(yaml_data: Dict[str, Any]) -> Dict[str, Any]:
         with contextlib.suppress(KeyError):
             del yaml_data["apps"][app_name]["extensions"]
 
+    applied_extensions = []  # type: List[str]
+
     # Process extensions in a consistent order
     for extension_name in sorted(declared_extensions.keys()):
-        extension = _load_extension(base, extension_name, original_yaml_data)
-        _apply_extension(
-            yaml_data, declared_extensions[extension_name], extension_name, extension
+        _process_extension(
+            base,
+            yaml_data,
+            declared_extensions[extension_name],
+            extension_name,
+            applied_extensions,
         )
 
     return yaml_data
+
+
+def _process_extension(
+    base: str,
+    yaml_data: Dict[str, Any],
+    app_names: Set[str],
+    extension_name: str,
+    applied_extensions: List[str],
+):
+    logger.debug("Process_extension: {}".format(extension_name))
+
+    if extension_name not in applied_extensions:
+        applied_extensions.append(extension_name)
+        extension = _load_extension(base, extension_name, yaml_data)
+        for dependency in extension.depends_on:
+            _process_extension(
+                base, yaml_data, app_names, dependency, applied_extensions
+            )
+        _apply_extension(yaml_data, app_names, extension_name, extension)
 
 
 def find_extension(extension_name: str) -> Type[Extension]:
@@ -137,6 +160,8 @@ def _apply_extension(
     extension_name: str,
     extension: Extension,
 ):
+    logger.debug("Apply extension: {}".format(extension_name))
+
     # Apply the root components of the extension (if any)
     root_extension = extension.root_snippet
     for property_name, property_value in root_extension.items():
