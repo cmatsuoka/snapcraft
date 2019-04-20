@@ -17,11 +17,12 @@
 # Import types and tell flake8 to ignore the "unused" List.
 from typing import Any, Dict, List  # noqa: F401
 
-from ._desktop_common import DesktopCommonExtension
+# from ._desktop_common import DesktopCommonExtension
+from ._extension import Extension
 from .. import errors
 
 
-class Gnome_3_28Extension(DesktopCommonExtension):
+class Gnome_3_28Extension(Extension):
     """The Gnome extension.
     This extension is to be used by applications that require GTK+.
     Examples might include productivity applications or utilities.
@@ -30,6 +31,7 @@ class Gnome_3_28Extension(DesktopCommonExtension):
 
     supported_bases = ("core18",)
     supports_classic = False
+    depends_on = ("desktop-common",)
 
     def __init__(self, yaml_data: Dict[str, Any]) -> None:
         """Create a new GnomeExtension.
@@ -59,10 +61,10 @@ class Gnome_3_28Extension(DesktopCommonExtension):
         }  # type: Dict[str, Any]
 
         self.root_snippet = {
-            **self.root_snippet,
+            # **self.root_snippet,
             **layout,
             "plugs": {
-                **self.plugs,
+                # **self.plugs,
                 platform_snap: {
                     "interface": "content",
                     "target": "$SNAP/gnome-platform",
@@ -72,25 +74,25 @@ class Gnome_3_28Extension(DesktopCommonExtension):
                 },
             },
             "environment": {
-                **self.environment,
+                # **self.environment,
                 "SNAP_DESKTOP_RUNTIME": "$SNAP/gnome-platform",
             },
         }
 
-        command_chain = self.app_snippet["command-chain"]
-
-        command_chain = command_chain + [
-            "snap/command-chain/desktop-gnome-specific",
-        ]
+        # FIXME
+        command_chain = []
+        if "command-chain" in self.app_snippet:
+            command_chain = self.app_snippet["command-chain"]
+        command_chain = command_chain + ["snap/command-chain/desktop-gnome-specific"]
 
         self.app_snippet = {
-            **self.app_snippet,
+            # **self.app_snippet,
             "command-chain": command_chain,
             "adapter": "full",
         }
 
         self.parts = {
-            **self.parts,
+            # **self.parts,
             "gnome-extension": {
                 "plugin": "dump",
                 "source": "$SNAPCRAFT_EXTENSIONS_DIR/gnome",

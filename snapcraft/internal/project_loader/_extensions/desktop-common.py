@@ -19,12 +19,15 @@ from typing import Any, Dict
 from ._extension import Extension
 
 
-class DesktopCommonExtension(Extension):
+class Desktop_commonExtension(Extension):
     """The Common Desktop extension.
     This extension is to be subclassed by the gnome and kde extensions.
     It includes common code that each desktop extension would otherwise
     need to duplicate.
     """
+
+    supported_bases = ("core", "core16", "core18")
+    supports_classic = False
 
     def __init__(self, yaml_data: Dict[str, Any]) -> None:
         """Create a new DesktopCommonExtension.

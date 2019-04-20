@@ -38,8 +38,9 @@ class Extension:
     :ivar parts: Instance variable, dict of part definitions required by this extension.
     """
 
-    supported_bases = None  # type: Tuple[str, ...]
+    supported_bases = ()  # type: Tuple[str, ...]
     supports_classic = True
+    depends_on = ()  # type: Tuple[Extension, ...]
 
     def __init__(self, yaml_data: Dict[str, Any]) -> None:
         """Create a new Extension.

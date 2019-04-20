@@ -40,7 +40,6 @@ class ExtensionCombinationTest(ProjectLoaderBaseTest):
                 ]
                 for extension_name in supported_extension_names()
             ]
-            or [[]]  # This guard can be removed once at least one extension is added
         )
     )
 

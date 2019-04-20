@@ -17,11 +17,12 @@
 # Import types and tell flake8 to ignore the "unused" List.
 from typing import Any, Dict, List  # noqa: F401
 
-from ._desktop_common import DesktopCommonExtension
+# from ._desktop_common import DesktopCommonExtension
+from ._extension import Extension
 from .. import errors
 
 
-class Kf5_neonExtension(DesktopCommonExtension):
+class Kf5_neonExtension(Extension):
     """The KDE Frameworks 5 Neon extension.
     This extension is to be used by applications that use KDE Neon.
     Examples might include productivity applications or utilities.
@@ -31,6 +32,7 @@ class Kf5_neonExtension(DesktopCommonExtension):
 
     supported_bases = ("core18",)
     supports_classic = False
+    depends_on = ("desktop-common",)
 
     def __init__(self, yaml_data: Dict[str, Any]) -> None:
         """Create a new Kde5Extension.
@@ -51,31 +53,33 @@ class Kf5_neonExtension(DesktopCommonExtension):
             raise errors.ExtensionUnsupportedBaseError("kf5-neon", base)
 
         self.root_snippet = {
-            **self.root_snippet,
+            # **self.root_snippet,
             "plugs": {
-                **self.plugs,
+                # **self.plugs,
                 "kde-frameworks-5-plug": {
                     "interface": "content",
                     "content": content,
                     "target": "kf5",
                     "default-provider": provider,
-                },
+                }
             },
-            "environment": {**self.environment, "SNAP_DESKTOP_RUNTIME": "$SNAP/kf5"},
+            "environment": {"SNAP_DESKTOP_RUNTIME": "$SNAP/kf5"},
         }
 
+        # FIXME
         command_chain = ["snap/command-chain/kf5-connect"]
-        command_chain = command_chain + self.app_snippet["command-chain"]
+        if "command-chain" in self.app_snippet:
+            command_chain = command_chain + self.app_snippet["command-chain"]
         command_chain = command_chain + ["snap/command-chain/kf5-launch"]
 
         self.app_snippet = {
-            **self.app_snippet,
+            # **self.app_snippet,
             "command-chain": command_chain,
             "adapter": "full",
         }
 
         self.parts = {
-            **self.parts,
+            # **self.parts,
             "kde-frameworks-5-env": {
                 "plugin": "dump",
                 "source": "$SNAPCRAFT_EXTENSIONS_DIR/kf5-neon",
@@ -85,5 +89,5 @@ class Kf5_neonExtension(DesktopCommonExtension):
                     "kf5-launch": "snap/command-chain/",
                 },
                 "build-packages": ["build-essential", "cmake"],
-            },
+            }
         }

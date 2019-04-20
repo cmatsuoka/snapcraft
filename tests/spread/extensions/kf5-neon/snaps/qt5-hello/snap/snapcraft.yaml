@@ -10,7 +10,7 @@ base: core18
 apps:
   qt5-hello:
     command: bin/hello
-    extensions: [kf5-neon]
+    extensions: [kf5-neon, gnome-3-28]
     plugs:
     - kde-frameworks-5-plug
 
