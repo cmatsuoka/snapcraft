@@ -66,7 +66,6 @@ class Kf5_neonExtension(DesktopCommonExtension):
 
         self.command_chain_prepend = ["snap/command-chain/kf5-connect"]
         self.command_chain_append = ["snap/command-chain/kf5-launch"]
-        self.app_snippet = {**self.app_snippet, "adapter": "none"}
 
         self.parts = {
             **self.parts,
