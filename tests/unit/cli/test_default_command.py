@@ -31,6 +31,7 @@ def test_default_command(mocker):
         call(
             argparse.Namespace(
                 debug=False,
+                split_debug=False,
                 directory=None,
                 output=None,
                 destructive_mode=False,
@@ -59,6 +60,7 @@ def test_default_command_destructive_mode(mocker):
                 directory=None,
                 output=None,
                 debug=False,
+                split_debug=False,
                 destructive_mode=True,
                 use_lxd=False,
                 enable_manifest=False,
@@ -85,6 +87,7 @@ def test_default_command_use_lxd(mocker):
                 directory=None,
                 output=None,
                 debug=False,
+                split_debug=False,
                 destructive_mode=False,
                 use_lxd=True,
                 enable_manifest=False,
@@ -112,6 +115,7 @@ def test_default_command_output(mocker, option):
                 directory=None,
                 output="name",
                 debug=False,
+                split_debug=False,
                 destructive_mode=False,
                 use_lxd=False,
                 enable_manifest=False,

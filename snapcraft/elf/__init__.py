@@ -18,9 +18,11 @@
 
 from ._elf_file import ElfFile, SonameCache
 from ._patcher import Patcher
+from ._splitter import DebugSplitter
 
 __all__ = [
     "ElfFile",
     "SonameCache",
     "Patcher",
+    "DebugSplitter",
 ]

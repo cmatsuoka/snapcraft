@@ -50,6 +50,11 @@ class _LifecycleCommand(BaseCommand, abc.ABC):
             help="Shell into the environment if the build fails",
         )
         parser.add_argument(
+            "--split-debug",
+            action="store_true",
+            help="Generate split debug symbols",
+        )
+        parser.add_argument(
             "--enable-manifest",
             action="store_true",
             default=utils.strtobool(os.getenv("SNAPCRAFT_BUILD_INFO", "n")),

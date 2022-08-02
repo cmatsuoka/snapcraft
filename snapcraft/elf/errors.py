@@ -36,6 +36,18 @@ class PatcherError(errors.SnapcraftError):
         )
 
 
+class SplitterError(errors.SnapcraftError):
+    """Failed to patch an ELF file."""
+
+    def __init__(self, *, cmd: List[str], code: int) -> None:
+        self.cmd = cmd
+        self.code = code
+
+        super().__init__(
+            f"Debug splitter error: command {cmd} failed with exit code {code}"
+        )
+
+
 class CorruptedElfFile(errors.SnapcraftError):
     """Not a valid ELF file."""
 

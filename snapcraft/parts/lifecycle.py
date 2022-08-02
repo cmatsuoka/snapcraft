@@ -30,6 +30,7 @@ from craft_cli import EmitterMode, emit
 from craft_parts import ProjectInfo, StepInfo, callbacks
 
 from snapcraft import errors, extensions, linters, pack, providers, utils
+from snapcraft.elf import DebugSplitter, elf_utils
 from snapcraft.linters import LinterStatus
 from snapcraft.meta import manifest, snap_yaml
 from snapcraft.projects import (
@@ -276,8 +277,11 @@ def _run_command(
         target_arch=project.get_build_for(),
     )
 
+    debug_dir = lifecycle.prime_dir.parent / ".build-id"
+
     if command_name == "clean":
         lifecycle.clean(part_names=part_names)
+        shutil.rmtree(debug_dir)
         return
 
     lifecycle.run(
@@ -286,6 +290,10 @@ def _run_command(
         shell=getattr(parsed_args, "shell", False),
         shell_after=getattr(parsed_args, "shell_after", False),
     )
+
+    # Extract debug information
+    if getattr(parsed_args, "split_debug", False):
+        _extract_debug_information(lifecycle.prime_dir, debug_dir=debug_dir)
 
     # Extract metadata and generate snap.yaml
     if step_name == "prime" and not part_names:
@@ -315,6 +323,26 @@ def _run_command(
             target_arch=project.get_build_for(),
         )
         emit.message(f"Created snap package {snap_filename}")
+
+
+def _extract_debug_information(prime_dir: Path, *, debug_dir: Path) -> Path:
+    emit.progress("Extracting debug information...")
+
+    arch_triplet = elf_utils.get_arch_triplet()  # XXX: use the build-for arch
+    if debug_dir.is_dir():
+        shutil.rmtree(debug_dir)
+        debug_dir.mkdir()
+
+    elf_files = elf_utils.get_elf_files(prime_dir)
+
+    debug_splitter = DebugSplitter(arch_triplet=arch_triplet, debug_dir=debug_dir)
+    for elf_file in elf_files:
+        elf_relpath = elf_file.path.relative_to(prime_dir)
+        emit.debug(f"Checking debug info for {str(elf_relpath)!r}")
+        debug_splitter.split(elf_file)
+
+    emit.progress("Extracted debug information", permanent=True)
+    return debug_dir
 
 
 def _generate_metadata(
@@ -448,6 +476,8 @@ def _run_in_provider(
 
     if parsed_args.debug:
         cmd.append("--debug")
+    if parsed_args.split_debug:
+        cmd.append("--split-debug")
     if getattr(parsed_args, "shell", False):
         cmd.append("--shell")
     if getattr(parsed_args, "shell_after", False):

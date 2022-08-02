@@ -21,7 +21,7 @@ import os
 import platform
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Set
+from typing import Iterable, List, Optional, Set
 
 import elftools.common.exceptions
 import elftools.elf.elffile
@@ -128,9 +128,15 @@ def get_dynamic_linker(*, root_path: Path, snap_path: Path) -> str:
     return str(snap_path / arch_config.dynamic_linker)
 
 
-def get_arch_triplet() -> str:
-    """Inform the arch triplet string for the current architecture."""
-    arch = platform.machine()
+def get_arch_triplet(arch: Optional[str] = None) -> str:
+    """Inform the arch triplet string for the given architecture.
+
+    :param arch: The architecture to get the triplet for, or use the host's
+        architecture if not specified.
+    """
+    if not arch:
+        arch = platform.machine()
+
     arch_config = _ARCH_CONFIG.get(arch)
     if not arch_config:
         raise RuntimeError(f"Arch triplet not defined for arch {arch!r}")
