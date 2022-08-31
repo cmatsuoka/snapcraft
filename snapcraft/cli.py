@@ -234,6 +234,9 @@ def run():
         retcode = 0
     except errors.LegacyFallback as err:
         run_legacy(err)
+    except KeyboardInterrupt as err:
+        _emit_error(craft_cli.errors.CraftError("Interrupted."))
+        retcode = 1
     except craft_store.errors.NoKeyringError as err:
         _emit_error(
             craft_cli.errors.CraftError(
