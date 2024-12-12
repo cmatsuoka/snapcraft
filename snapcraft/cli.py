@@ -59,6 +59,7 @@ CORE24_LIFECYCLE_COMMAND_GROUP = craft_cli.CommandGroup(
         craft_application.commands.lifecycle.StageCommand,
         craft_application.commands.lifecycle.PrimeCommand,
         commands.PackCommand,
+        craft_application.commands.lifecycle.TestCommand,
         commands.SnapCommand,  # Hidden (legacy compatibility)
         commands.RemoteBuildCommand,
         commands.TryCommand,

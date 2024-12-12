@@ -22,6 +22,7 @@ import logging
 import os
 import pathlib
 import sys
+import tempfile
 from typing import Any
 
 import craft_cli
@@ -447,6 +448,22 @@ class Snapcraft(Application):
         super()._set_global_environment(info)
         set_global_environment(info)
 
+    @override
+    def _run_tests(self) -> None:
+        """Execute tests on the specified artifacts."""
+        packages = self.services.lifecycle.load_pack_state()
+        test_snap, *test_components = packages
+
+        craft_cli.emit.progress(f"Testing {test_snap}...")
+
+        with tempfile.TemporaryDirectory(prefix=".craft-", dir=".") as tempdir:
+            destdir = pathlib.Path(tempdir)
+            test_env = {
+                "TEST_SNAP": f"$PROJECT_PATH/{test_snap}",
+                "TEST_COMPONENTS": " ".join([f"$PROJECT_PATH/{x}" for x in test_components]),
+            }
+            self.services.testing.process_spread_yaml(destdir, test_env)
+            self.services.testing.run_spread(destdir)
 
 def create_app() -> Snapcraft:
     """Create a Snapcraft application with the proper commands."""
